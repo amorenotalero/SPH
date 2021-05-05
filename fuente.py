@@ -19,7 +19,7 @@ def generaColumna(posicionInicial, masa, numParticulasX, numParticulasY, numPart
                       else:
                             valor = 0.0
                       control = 1.0+valor
-                      posicionModificada = posicionInicial+(vector(i,j,k)*separacion)
+                      posicionModificada = posicionInicial+(vector(i*control,j,k)*separacion)
                       p.setPosicion(posicionModificada)
                       listaParticulas.addParticula(p)
     return listaParticulas
