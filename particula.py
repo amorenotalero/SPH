@@ -9,6 +9,8 @@ class Particula:
         self.posicion = posicion
         self.velocidad = velocidad
         self.radio = radio
+        self.masa = 0
+        self.densidad = 0
         self.vecinas = []
         self.fuerzas = vector(0,0,0)
         self.estadoColision = False
@@ -106,4 +108,14 @@ class Particula:
     
     def setEstadoColision(self, estado):
         self.estadoColision = estado
+    
+    def getMasa(self):
+        return self.masa
+    def setMasa(self, masa):
+        self.masa = masa
+    
+    def getDensidad(self):
+        return self.densidad
+    def setDensidad(self, densidad):
+        self.densidad = densidad
         

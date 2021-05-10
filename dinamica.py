@@ -4,6 +4,7 @@ from particula import Particula
 from sistemaParticulas import SistemaParticulas
 import fuente
 import Vecinas
+import kernel
 
 class Dinamica():
     def __init__(self, fluido, h):
@@ -46,9 +47,69 @@ class Dinamica():
             #print(fuerzaij)
             pi.setFuerza(fuerzaij)
             Fluido.changeParticula(i,pi)
+        self.fluido = Fluido
+            #f = pi.getFuerzas()
+            #print(f)
+"""   
+    def fuerzasSPH(self,K,nu):
+        Fluido = self.fluido
+        h = self.h
+        numParticulas = Fluido.getNumParticulas()
+        #print(numParticulas)
+         
+        for i in range(numParticulas):
+            pi = Fluido.getParticula(i)
+            vecinas = pi.getVecinas()
+            #print("----Lista de vecina en clase dinamica-------")
+            #print(vecinas)
+            #numVecinas = len(vecinas)
+            #print("----------Particula"+str(i)+"---------------")
+            for j in vecinas:
+                #recorre demasiado las listas simplificar codigo
+                DensidadMasa()
+                fuerzaPresion = FuerzaPresion()
+                fuerzaViscosidad = FuerzaViscosidad(nu)
+
+
+
+                
+
+            
+            fuerzaij = (-K)*sumatorio
+            #print(fuerzaij)
+            pi.setFuerza(fuerzaij)
+            Fluido.changeParticula(i,pi)
             self.fluido = Fluido
             #f = pi.getFuerzas()
             #print(f)
+
+    def DensidadMasa(self):
+        Fluido = self.fluido
+        h = self.h
+        numParticulas = Fluido.getNumParticulas()
+        for i in range(numParticulas):
+            pi = Fluido.getParticula(i)
+            vecinas = pi.getVecinas()
+            sumatorio = 0
+            for j in vecinas:
+                #print(j)
+                pj = Fluido.getParticula(j)
+                ri = pi.getPosicion()
+                rj = pj.getPosicion()
+                vectorDistancia =  rj - ri
+                magnitudDistancia = mag(vectorDistancia)
+                sumatorio = pj.getMasa()*kernel.Funcionkernel(h,magnitudDistancia) + sumatorio
+            pi.setDensidad(sumatorio)
+            Fluido.changeParticula(i,pi)
+            self.fluido = Fluido
+    
+    def FuerzaPresion
+
+
+
+
+
+"""
                 
 """        
 masa = 0.1

@@ -59,7 +59,8 @@ tasaAmortiguamiento = 0.8 #tasa amortiguamiento en la colision
 masa = 0.1
 radio = 0.04
 h = 0.18 #radio dominio soportado
-separacion = 0.17 #1.08*h
+#separacion = 0.17
+separacion = 1.08*h
 numParticulasX = 5
 numParticulasY  = 5
 numParticulasZ = 5
@@ -86,7 +87,7 @@ fuerzaExterna = aceleracion*masa
 #--------------------------------------------------------------
 #Variables para el bucle de simulacion.
 
-K = -180
+K = -2650
 pasoTiempo = 0.001
 cont = 0
 

@@ -14,12 +14,12 @@ def generaColumna(posicionInicial, masa, numParticulasX, numParticulasY, numPart
                 for i in range(numParticulasX):
                       p = Particula(posicionInicial,vector(0,0,0),radio,vector(0.79,0.95,1))
                       p.setVelocidad(velocidadInicial)
-                      if(k%2==0):
-                            valor = 0.1
+                      p.setMasa(masa)
+                      if(j==0):
+                            control = i+0.1#modifica el primer estrato para moverlo hacia la derecha y que no reboten sobre ellas
                       else:
-                            valor = 0.0
-                      control = 1.0+valor
-                      posicionModificada = posicionInicial+(vector(i,j,k)*separacion)
+                            control = i
+                      posicionModificada = posicionInicial+(vector(control,j,k)*separacion)
                       p.setPosicion(posicionModificada)
                       listaParticulas.addParticula(p)
     return listaParticulas
