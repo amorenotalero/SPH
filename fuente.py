@@ -9,17 +9,18 @@ def generaColumna(posicionInicial, masa, numParticulasX, numParticulasY, numPart
 
 
     for k in range(numParticulasZ):
-          valor = 0.0
           for j in range(numParticulasY):
                 for i in range(numParticulasX):
                       p = Particula(posicionInicial,vector(0,0,0),radio,vector(0.79,0.95,1))
                       p.setVelocidad(velocidadInicial)
                       p.setMasa(masa)
                       if(j==0):
-                            control = i+0.1#modifica el primer estrato para moverlo hacia la derecha y que no reboten sobre ellas
+                            controlX = i+0.1#modifica el primer estrato para moverlo hacia la derecha y que no reboten sobre ellas
+                            controlZ = k+0.1
                       else:
-                            control = i
-                      posicionModificada = posicionInicial+(vector(control,j,k)*separacion)
+                            controlX = i
+                            controlZ = k
+                      posicionModificada = posicionInicial+(vector(controlX,j,controlZ)*separacion)
                       p.setPosicion(posicionModificada)
                       listaParticulas.addParticula(p)
     return listaParticulas

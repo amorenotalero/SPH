@@ -20,7 +20,6 @@ def detectaColisionLimites(LimitesX, LimitesY, LimitesZ, espesor, particula):
     colisionLimX = posicion.x < LimX_inf or posicion.x > LimX_sup 
     colisionLimY = posicion.y < LimY_inf or posicion.y > LimY_sup
     colisionLimZ = posicion.z < LimZ_inf or posicion.z > LimZ_sup
-    colisiona = False
     if colisionLimX:
         if posicion.x > LimX_sup:
             #particula.setEstadoColision(True)
@@ -33,15 +32,13 @@ def detectaColisionLimites(LimitesX, LimitesY, LimitesZ, espesor, particula):
         particula.setEstadoColision(True)
 
     if colisionLimY:
-        if posicion.y > LimY_sup:
-            #particula.setEstadoColision(True)
-            normal_y = -1*normal_y
-            vectorNormal = vectorNormal + normal_y
-        else:
+        if posicion.y < LimY_inf:
             #particula.setEstadoColision(True)
             vectorNormal = vectorNormal + normal_y
+            particula.setEstadoColision(True)
+
+        #Le he quitado el else para que la caja este abierta
         
-        particula.setEstadoColision(True)
 
     if colisionLimZ:
         
@@ -73,15 +70,15 @@ def detectaColisionCilindro(LimiteY, eje, espesor, radio, particula):
     posicionPart = particula.getPosicion()
     LimiteY_inf = LimiteY[0] + espesor
     LimiteY_sup = LimiteY[1] - espesor
-    colisionLimY = posicionPart.y < LimY_inf or posicionPart.y > LimY_sup
+    colisionLimY = posicionPart.y < LimiteY_inf or posicionPart.y > LimiteY_sup
     vectorDistancia = posicionPart - vector(eje.x,posicionPart.y,eje.z)
     distancia = mag(vectorDistancia)
     fueraRadio = radio < distancia
     if(colisionLimY or fueraRadio):
-        if(posicionPart.y < LimY_inf):
+        if(posicionPart.y < LimiteY_inf):
             colisiona = True
             respuestaColision(particula,eje)
-        if posicionPart.y > LimY_sup:
+        if posicionPart.y > LimiteY_sup:
             colisiona = True
             respuestaColision(particula,-eje)
         if fueraRadio:

@@ -61,8 +61,8 @@ radio = 0.04
 h = 0.18 #radio dominio soportado
 #separacion = 0.17
 separacion = 1.08*h
-numParticulasX = 5
-numParticulasY  = 5
+numParticulasX = 10
+numParticulasY  = 10
 numParticulasZ = 5
 posicionInicial = vector(-0.5,0.0, -0.5)
 #velocidadInicial = vector(0.2,-4.0,0.5)
@@ -75,6 +75,7 @@ print("eeeeeeeeoooo   "+str(numeroParticulas))
 #----------------------------------------------------------
 
 #Calcular fuerzas internas con la clase dinamica 
+
 dinamica = Dinamica(fluido, h)
 
 #dinamicaEstable = DinamicaEstable(fluido, separacion)
@@ -87,7 +88,8 @@ fuerzaExterna = aceleracion*masa
 #--------------------------------------------------------------
 #Variables para el bucle de simulacion.
 
-K = -2650
+K = 2650
+nu = 0.86
 pasoTiempo = 0.001
 cont = 0
 
@@ -107,7 +109,9 @@ while cont < 6000:
     
 
     #Calcula la fuerza interna para todo el sistema
-    fuerzas = dinamica.fuerzas(K)
+    dinamica.DensidadMasa()
+    #fuerzas = dinamica.fuerzas(K)
+    fuerzas = dinamica.fuerzasSPH(K,nu)
     #print(fuerzas)
    
     for i in range(numeroParticulas):
@@ -117,15 +121,20 @@ while cont < 6000:
             #la particula ha colisionado
             particula_i.setEstadoColision(False)
         else:
+            #print("Particula numero "+str(i))
+            #print(particula_i.getVecinas())
             velocidadParticula = particula_i.getVelocidad()
             posicionParticula = particula_i.getPosicion()
             #obtengo fuerzas internas que calcule en la clase dinamica.
             fuerzasInternas = particula_i.getFuerzas()
             #print(fuerzasInternas)
             fuerzaNeta = fuerzasInternas + fuerzaExterna
+            #print(fuerzaNeta)
             #aceleracion = operacionesVectoriales.escalarVector((1.0/masa),fuerzaNeta)
             aceleracion = (1.0/masa)*fuerzaNeta
-            
+            fuerzaZero = vector(0.0,0.0,0.0)
+            particula_i.setFuerza(fuerzaZero)
+            #print(aceleracion)
             nuevaCinematica = metodoIntegracion.MetodoEuler(posicionParticula, velocidadParticula, aceleracion, pasoTiempo)
             particula_i.setPosicion(nuevaCinematica[0])
             particula_i.setVelocidad(nuevaCinematica[1])

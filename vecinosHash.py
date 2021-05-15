@@ -42,8 +42,8 @@ def calculaVecinosHash(listaParticulas,h):
                             if(listaVecinas.count(elem)==0 and elem!=p):#asegura que no esta en la lista de vecinas y que no es la misma particula
                                 d = mag(elem.getPosicion()-p.getPosicion())
                                 if d < h:
-                                    #listaVecinas.append(elem)
                                     indexParticulaElem = listaParticulas.getIndex(elem)
+                                    #listaVecinas.append(indexParticulaElem)
                                     p.addVecina(indexParticulaElem)
                                     indexParticulaP = listaParticulas.getIndex(p)
                                     listaParticulas.changeParticula(indexParticulaP,p)
