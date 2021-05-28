@@ -26,4 +26,7 @@ class SistemaParticulas:
         return index
     def changeParticula(self, index, particula):
         self.listaParticulas[index]=particula
+    def addSistema(self, sistema):
+        for p in sistema.getParticulas():
+            self.listaParticulas.append(p)
 

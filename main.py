@@ -10,7 +10,8 @@ import metodoIntegracion
 import fuente
 import vecinosHash
 import Vecinas
-
+import exportadorBIN_RF
+import povexport
 
 print("inicio sistema")
 
@@ -26,6 +27,7 @@ scene.center # look up
 
 #Generar contenedor con el que colisiona las particulas.
 caja = box(pos=vector(0.0,0.0,0.0), length=5, height=3, width=2.0)
+esfera = sphere(pos=vector(0.0,-2.0,0.0), radius=1)
 caja.opacity = 0.1
 
 #Se genera un objeto de colision y a ese objeto se le pasa para como parametro la caja
@@ -35,7 +37,7 @@ caja.opacity = 0.1
 posicionX = caja.pos.x
 LimSupX = posicionX + (0.5*caja.length)
 LimInfX = posicionX - (0.5*caja.length)
-LimitesX = [LimInfX,LimSupX]    
+LimitesX = [LimInfX,LimSupX]   
 #Limites de Y
 posicionY = caja.pos.y
 LimSupY = posicionY + (0.5*caja.height)
@@ -47,9 +49,11 @@ LimSupZ = posicionZ + (0.5*caja.width)
 LimInfZ = posicionZ - (0.5*caja.width)
 LimitesZ = [LimInfZ,LimSupZ]
 
-espesor = 0.06#cota de tolerancia a la colision
 tasaAmortiguamiento = 0.8 #tasa amortiguamiento en la colision
 #-----------------------------
+#-------------------------ESFERA LIMITES-----------------------
+centro = esfera.pos
+radioEsfera = esfera.radius
 
 
 #-----------------------------
@@ -57,21 +61,25 @@ tasaAmortiguamiento = 0.8 #tasa amortiguamiento en la colision
 #-----------------------------
 
 masa = 0.1
-radio = 0.04
+rad = 0.04
+espesor = 0.001+rad#cota de tolerancia a la colision
+LimitesCaja = [LimitesX,LimitesY,LimitesZ,espesor]
+LimitesEsfera = [centro,radioEsfera,espesor]
 h = 0.18 #radio dominio soportado
 #separacion = 0.17
 separacion = 1.08*h
-numParticulasX = 10
-numParticulasY  = 10
-numParticulasZ = 5
-posicionInicial = vector(-0.5,0.0, -0.5)
+numParticulasX = 8
+numParticulasY  = 32
+numParticulasZ = 8
+#posicionInicial = vector(-0.5,0.0, -0.5)
+posicionInicial = vector(0.0,7.0,0.0)
+NumeroCoronas = 5
 #velocidadInicial = vector(0.2,-4.0,0.5)
-velocidadInicial = vector(0,0,0)
+velocidadInicial = vector(0.0,0.0,0.0)
 #Generar fuente de columna cuadrada
-fluido = fuente.generaColumna(posicionInicial, masa, numParticulasX, numParticulasY, numParticulasZ, separacion, velocidadInicial, radio)
+#fluido = fuente.generaColumna(posicionInicial, masa, numParticulasX, numParticulasY, numParticulasZ, separacion, velocidadInicial, rad)
+fluido = fuente.generaCirculo(posicionInicial,masa,NumeroCoronas,separacion,velocidadInicial,rad)
 
-numeroParticulas = fluido.getNumParticulas()
-print("eeeeeeeeoooo   "+str(numeroParticulas))
 #----------------------------------------------------------
 
 #Calcular fuerzas internas con la clase dinamica 
@@ -92,12 +100,18 @@ K = 2650
 nu = 0.86
 pasoTiempo = 0.001
 cont = 0
-
+nFrame = 0
+inclist = ['colors.inc', 'stones.inc', 'woods.inc', 'metals.inc']
 #parte iterativa del bucle de simulacion
 
-while cont < 6000:
+while cont < 3000:
     rate(100)
-    
+    numeroParticulas = fluido.getNumParticulas()
+    if(cont%15==0 and fluido.getNumParticulas()<2000):
+        posicionInicial = posicionInicial- vector(0.0,separacion,0.0)
+        estrato = fuente.generaCirculo(posicionInicial,masa,NumeroCoronas,separacion,velocidadInicial,rad)
+        #sistema = estrato.getParticulas()
+        fluido.addSistema(estrato)
     print ('Estoy en el paso: '+repr(cont))
     
     #Calcula vecinas.
@@ -116,7 +130,8 @@ while cont < 6000:
    
     for i in range(numeroParticulas):
         particula_i = fluido.getParticula(i)
-        gestorColision.detectaColisionLimites(LimitesX, LimitesY, LimitesZ, espesor, particula_i)
+        #gestorColision.detectaColisionLimites(LimitesX, LimitesY, LimitesZ, espesor, particula_i)
+        gestorColision.colisionMultiple(particula_i,LimitesCaja,LimitesEsfera,[])
         if (particula_i.getEstadoColision() == True):
             #la particula ha colisionado
             particula_i.setEstadoColision(False)
@@ -128,6 +143,13 @@ while cont < 6000:
             #obtengo fuerzas internas que calcule en la clase dinamica.
             fuerzasInternas = particula_i.getFuerzas()
             #print(fuerzasInternas)
+            '''
+            para activar desactivar SPH
+            if(particula_i.getEstadoSPH()==False):
+                fuerzaNeta = fuerzaExterna
+            else:
+                fuerzaNeta = fuerzasInternas + fuerzaExterna
+            '''
             fuerzaNeta = fuerzasInternas + fuerzaExterna
             #print(fuerzaNeta)
             #aceleracion = operacionesVectoriales.escalarVector((1.0/masa),fuerzaNeta)
@@ -139,6 +161,13 @@ while cont < 6000:
             particula_i.setPosicion(nuevaCinematica[0])
             particula_i.setVelocidad(nuevaCinematica[1])
             fluido.changeParticula(i,particula_i)
+        
+       
+    if(cont%15==0):
+        exportadorBIN_RF.exportar("binarios\Frame",nFrame,fluido,rad)
+        povexport.export(canvas=scene, filename='archivosPov\PovRay'+str(nFrame)+'.pov', include_list=inclist)
+        nFrame+=1
+    
     cont+=1
 
 print("Simulacion Concluida")

@@ -12,8 +12,9 @@ class Particula:
         self.masa = 0
         self.densidad = 0
         self.vecinas = []
-        self.fuerzas = vector(0,0,0)
+        self.fuerzas = vector(0.0,0.0,0.0)
         self.estadoColision = False
+        self.activaSPH = False
         if (color is None):
             self.color = vector(0,0,1)
         else:
@@ -118,4 +119,8 @@ class Particula:
         return self.densidad
     def setDensidad(self, densidad):
         self.densidad = densidad
+    def setEstadoSPH(self):
+        self.activaSPH = True
+    def getEstadoSPH(self):
+        return self.activaSPH
         

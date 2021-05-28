@@ -52,39 +52,73 @@ def detectaColisionLimites(LimitesX, LimitesY, LimitesZ, espesor, particula):
 
         particula.setEstadoColision(True)
 
-    if(particula.getEstadoColision()==True):
-        respuestaColision(particula,vectorNormal,espesor)
+    return vectorNormal
+    #if(particula.getEstadoColision()==True):
+        #particula.setEstadoSPH()
+        
+    #    respuestaColision(particula,vectorNormal,espesor)
 
 
-def detectaColisionEsfera(centro, radio, particula):
-    colisiona = False
-    vectorDistancia = centro - particula.getPosicion()
+def detectaColisionEsfera(centro, radio,espesor, particula):
+    vectorNormal = vector(0.0, 0.0, 0.0)
+    vectorDistancia = particula.getPosicion()-centro 
     distancia = mag(vectorDistancia)
-    if distancia > radio:
-        colisiona = True
-        respuestaColision(particula, vectorDistancia)
-    return colisiona
+    radio = radio + espesor
+    if distancia < radio:
+        particula.setEstadoColision(True)
+        #respuestaColision(particula, vectorDistancia)
+        vectorNormal = vectorNormal + vectorDistancia
+    return vectorNormal
 
 def detectaColisionCilindro(LimiteY, eje, espesor, radio, particula):
-    colisiona = False
+    vectorNormal = vector(0.0, 0.0, 0.0)
     posicionPart = particula.getPosicion()
     LimiteY_inf = LimiteY[0] + espesor
     LimiteY_sup = LimiteY[1] - espesor
     colisionLimY = posicionPart.y < LimiteY_inf or posicionPart.y > LimiteY_sup
     vectorDistancia = posicionPart - vector(eje.x,posicionPart.y,eje.z)
     distancia = mag(vectorDistancia)
-    fueraRadio = radio < distancia
+    radio = radio + espesor
+    fueraRadio = distancia < radio
     if(colisionLimY or fueraRadio):
         if(posicionPart.y < LimiteY_inf):
-            colisiona = True
-            respuestaColision(particula,eje)
+            particula.setEstadoColision(True)
+            vectorNormal = vectorNormal+eje
         if posicionPart.y > LimiteY_sup:
-            colisiona = True
-            respuestaColision(particula,-eje)
+            particula.setEstadoColision(True)
+            vectorNormal = vectorNormal-eje
         if fueraRadio:
-            colisiona = True
-            respuestaColision(particula,vectorDistancia)
-    return colisiona
+            particula.setEstadoColision(True)
+            vectorNormal = vectorNormal + vectorDistancia
+    return vectorNormal
+
+def colisionMultiple(particula,caja,esfera,cilindro):
+    vectorNormal = vector(0.0, 0.0, 0.0)
+    if(esfera!=[]):
+        centro = esfera[0]
+        radio = esfera[1]
+        espesor = esfera[2]
+        vectorEsfera = detectaColisionEsfera(centro, radio,espesor, particula)
+        vectorNormal = vectorNormal + vectorEsfera
+    if(caja!=[]):
+        LimitesX = caja[0]
+        LimitesY = caja[1]
+        LimitesZ = caja[2]
+        espesor = caja[3]
+        vectorCaja = detectaColisionLimites(LimitesX, LimitesY, LimitesZ, espesor, particula)
+        vectorNormal = vectorNormal + vectorCaja
+    
+    if(cilindro!=[]):
+        LimiteY = cilindro[0]
+        eje = cilindro[1]
+        espesor = cilindro[2]
+        radio = cilindro[3]
+        vectorCilindro = detectaColisionCilindro(LimiteY, eje, espesor, radio, particula)
+        vectorNormal = vectorNormal + vectorCilindro
+    if(particula.getEstadoColision()==True):
+        respuestaColision(particula,vectorNormal,espesor)
+
+    
 
             
 
@@ -137,8 +171,8 @@ def detectaColisionTriangulo(triangulo, particula):
 
 def respuestaColision(particula, vectorNormal, espesor):
     tasaRebote = 0.8
-    tasaRozamineto = 0.8
-    tasaPenetracion = 0.05*espesor
+    tasaRozamineto = 0.98
+    tasaPenetracion = 0.005*espesor
     Vinicial = particula.getVelocidad()
     posicion_incidente = particula.getPosicion()
     velocidadInicialNormal = proj(Vinicial,vectorNormal)
